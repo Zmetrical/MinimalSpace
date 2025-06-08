@@ -11,7 +11,24 @@
 </head>
 
 <body>
-    <div class="container">
+
+    <div class="shortcuts">
+            <button class="taskbar-btn" id="openTaskApp">Task Manager</button>
+            <button class="taskbar-btn" id="openTaskApp">Task Manager</button>
+            <button class="taskbar-btn" id="openTaskApp">Task Manager</button>
+    </div>
+
+    <div class="desktop" id="desktop">
+        <!-- Windows will be created here dynamically -->
+    </div>
+    
+    <div class="taskbar">
+
+        <div class="window-buttons" id="windowButtons">
+            <!-- Window buttons will appear here -->
+        </div>
+    </div>
+    <!-- <div class="container">
         <div class="window">
             <h1>Task Management</h1>
         </div>
@@ -40,168 +57,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </body>
-<script>
-    // Add your JavaScript here
-const addButton = document.getElementById("addTask");
-const addInput = document.getElementById("titleTask");
-const listContainer = document.querySelector(".list-container");
-const noteTitle = document.getElementById("noteTitle");
-const noteContainer = document.getElementById("noteContainer");
+<script src="script.js"></script>
 
-let taskCounter = 1;
-let currentFilter = 'all';
-let selectedTask = null;
-
-// Store task data
-const taskData = new Map();
-
-const listHeader = document.querySelectorAll(".list-header h2");
-
-// Filter functionality
-listHeader.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const current = document.querySelector(".list-header h2.active");
-        if (current) current.classList.remove("active");
-        btn.classList.add("active");
-        
-        // Update current filter and apply it
-        currentFilter = btn.getAttribute('data-filter');
-        applyFilter();
-    });
-});
-
-// Function to apply filter based on current selection
-function applyFilter() {
-    const allCards = document.querySelectorAll('.list-card');
-    
-    allCards.forEach(card => {
-        const checkbox = card.querySelector('.checkbox');
-        const isCompleted = checkbox.classList.contains('checked');
-        
-        switch(currentFilter) {
-            case 'pending':
-                card.style.display = isCompleted ? 'none' : 'flex';
-                break;
-            case 'completed':
-                card.style.display = isCompleted ? 'flex' : 'none';
-                break;
-            case 'all':
-            default:
-                card.style.display = 'flex';
-                break;
-        }
-    });
-}
-
-// Function to select a task and show its note
-function selectTask(taskId, taskElement) {
-    // Remove previous selection
-    const previousSelected = document.querySelector('.list-card.selected');
-    if (previousSelected) {
-        previousSelected.classList.remove('selected');
-    }
-    
-    // Add selection to current task
-    taskElement.classList.add('selected');
-    selectedTask = taskId;
-    
-    // Get task data
-    const data = taskData.get(taskId);
-    const taskTitle = taskElement.querySelector('h2').textContent;
-    
-    // Update note section
-    noteTitle.textContent = taskTitle;
-    noteContainer.innerHTML = data.note || '<p>No details added yet. Click here to add details.</p>';
-    
-    // Make note container editable
-    noteContainer.contentEditable = true;
-    noteContainer.style.cursor = 'text';
-}
-
-// Function to create a new task card
-function createTaskCard(taskText) {
-    const taskId = `task_${taskCounter}`;
-    const card = document.createElement('div');
-    card.className = 'list-card';
-    card.setAttribute('data-task-id', taskId);
-    card.innerHTML = `
-        <h2>${taskText}</h2>
-        <span class="checkbox"></span>
-    `;
-    
-    // Initialize task data
-    taskData.set(taskId, {
-        title: taskText,
-        note: '',
-        completed: false
-    });
-    
-    // Add click event to checkbox
-    const checkbox = card.querySelector('.checkbox');
-    checkbox.addEventListener('click', function(e) {
-        e.stopPropagation();
-        this.classList.toggle('checked');
-        
-        // Update task data
-        const data = taskData.get(taskId);
-        data.completed = this.classList.contains('checked');
-        
-        // Reapply filter after checkbox state changes
-        applyFilter();
-    });
-    
-    // Add click event to card (excluding checkbox)
-    card.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('checkbox')) {
-            selectTask(taskId, card);
-        }
-    });
-    
-    return card;
-}
-
-// Auto-save note content when it changes
-noteContainer.addEventListener('input', () => {
-    if (selectedTask) {
-        const data = taskData.get(selectedTask);
-        data.note = noteContainer.innerHTML;
-    }
-});
-
-// Prevent losing focus when clicking in the note container
-noteContainer.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
-
-// Add new task when button is clicked
-addButton.addEventListener("click", () => {
-    let taskText = addInput.value.trim();
-    if (taskText) {
-        const newCard = createTaskCard(taskText);
-        listContainer.appendChild(newCard);
-        addInput.value = ''; // Clear input after adding
-        taskCounter++;
-        // Apply current filter to new task
-        applyFilter();
-        
-        // Auto-select the new task
-        const taskId = newCard.getAttribute('data-task-id');
-        selectTask(taskId, newCard);
-    }
-});
-
-// Allow adding tasks with Enter key
-addInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        addButton.click();
-    }
-});
-
-// Initial state - make note container non-editable initially
-noteContainer.contentEditable = false;
-noteContainer.style.cursor = 'default';
-</script>
 
 </html>
