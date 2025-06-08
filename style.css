@@ -80,9 +80,6 @@ body {
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }
 
-
-
-
 .taskbar-btn:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.0) 100%);
     border-color: white;
